@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ITC298Assignment2</string>
+    <string name="action_settings">Settings</string>
+    <string name="title">Schedule</string>
+	<string name="addButton">Add</string>
+
+    <string-array name="days">
+        <item>saturday</item>
+         <item>sunday</item>
+         <item>monday</item>
+    </string-array>
+    
+    <string-array name="time">
+        <item>9:00</item>
+         <item>10:00</item>
+         <item>11:00</item>
+    </string-array>
+    
+     <string-array name="names">
+        <item>Band A</item>
+         <item>Band B</item>
+         <item>Band C</item>
+    </string-array>
+
+</resources>
