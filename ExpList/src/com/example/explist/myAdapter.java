@@ -2,7 +2,12 @@ package com.example.explist;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,17 +29,18 @@ public class myAdapter extends FragmentPagerAdapter {
 	// set up an array
 	// for tab titles
 	private String title = "Schedule";
-
-	public myAdapter(FragmentManager fm) {
+	protected JSONObject jsonObject;
+	public myAdapter(FragmentManager fm, JSONObject jsonObject) {
 		super(fm);
-
+		
+		this.jsonObject = jsonObject;
 	}
 
 	@Override
 	public Fragment getItem(int position) {
 		// getItem is called to instantiate the fragment for the given section.
 
-		Fragment fragment = new scheduleFragment();
+		Fragment fragment = new scheduleFragment(jsonObject);
 
 		return fragment;
 	}
@@ -52,11 +58,13 @@ public class myAdapter extends FragmentPagerAdapter {
 
 	}
 
+	@SuppressLint("ValidFragment")
 	public static class scheduleFragment extends Fragment {
 		ArrayList<Group> groupItem = new ArrayList<Group>();
-
-		public scheduleFragment() {
-
+		protected JSONObject jsonObject;
+		@SuppressLint("ValidFragment")
+		public scheduleFragment(JSONObject jsonObject) {
+			this.jsonObject = jsonObject;
 		}
 
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,21 +77,51 @@ public class myAdapter extends FragmentPagerAdapter {
 			// create an array list of eventItem so that we can put as many
 			// shows/events occurring
 			ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
-
+			/*JSONArray mJsonArray1 = new JSONArray();
+			JSONArray mJsonArray2 = new JSONArray();
+			JSONObject mJsonObject = new JSONObject();
+			*/
 			String name = null;
 			String time = null;
+			//loops through the object that contains days, with a loop that loops through the events on that day and gets name and time
+            for (int i = 1; i < jsonObject.length() + 1; i++) 
+            {
+            	try {
+		        	for (int j = 0; j < jsonObject.getJSONArray("Day" + (i)).length(); j++) 
+		        	{
+						name = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventName");
+		            	System.out.println("name test " + i + ":" + name);
+		            	time = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventStartTime");
+		            	System.out.println("Time test " + i + ":" + time);
+		            	EventItem tempList = new EventItem(name, time);
+						eventItems.add(tempList);
+		        	}
+            	} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
+            }
+            
 
 			// populate the day/time of the list with static data that I created
 			// in string value folder
-			for (int i = 0; i < getResources().getStringArray(R.array.names).length; i++) {
-
-				name = (getResources().getStringArray(R.array.names)[i]);
-				time = (getResources().getStringArray(R.array.time)[i]);
+			/*for (int i = 0; i < mJsonArray1.length(); i++) {
+				try {
+					mJsonObject = mJsonArray1.getJSONObject(i);
+					name = mJsonObject.getString("SubEventName");
+					time = mJsonObject.getString("SubEventStartTime");
+					System.out.print(name + " " + time);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				// create a temp list to hold the info and then add to our
 				// ultimate list that has all the events of the expand list
 				EventItem tempList = new EventItem(name, time);
 				eventItems.add(tempList);
 			}
+			*/
 			for (int j = 0; j < getResources().getStringArray(R.array.days).length; j++) {
 				// create a group class (one per each day of the event) which
 				// will contain all of the events(days of the festivals)
@@ -116,6 +154,11 @@ public class myAdapter extends FragmentPagerAdapter {
 			return v; // return our view
 		}
 		
+		
+		public View onProgressUpdate(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+			return container;
+			
+		}
 		private OnChildClickListener myListItemClicked = new OnChildClickListener() {
 
 			public boolean onChildClick(ExpandableListView parent, View v,
@@ -271,5 +314,11 @@ public class myAdapter extends FragmentPagerAdapter {
 
 		}
 
+		public static void publishProgress() {
+			// TODO Auto-generated method stub
+			System.out.print("fuck this");
+		}
+
 	}
+
 }
