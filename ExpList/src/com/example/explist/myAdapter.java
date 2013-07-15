@@ -1,12 +1,8 @@
 package com.example.explist;
 
 import java.util.ArrayList;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +11,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
@@ -74,64 +69,36 @@ public class myAdapter extends FragmentPagerAdapter {
 			// find the expandable list
 			ExpandableListView ExlistView = (ExpandableListView) v
 					.findViewById(R.id.list);
-			// create an array list of eventItem so that we can put as many
-			// shows/events occurring
-			ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
-			/*JSONArray mJsonArray1 = new JSONArray();
-			JSONArray mJsonArray2 = new JSONArray();
-			JSONObject mJsonObject = new JSONObject();
-			*/
+			
+			
 			String name = null;
 			String time = null;
 			//loops through the object that contains days, with a loop that loops through the events on that day and gets name and time
             for (int i = 1; i < jsonObject.length() + 1; i++) 
             {
-            	try {
+            	// create an array list of eventItem so that we can put as many
+    			// shows/events occurring
+            	ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
+            	try 
+            	{
 		        	for (int j = 0; j < jsonObject.getJSONArray("Day" + (i)).length(); j++) 
 		        	{
 						name = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventName");
 		            	System.out.println("name test " + i + ":" + name);
 		            	time = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventStartTime");
 		            	System.out.println("Time test " + i + ":" + time);
-		            	EventItem tempList = new EventItem(name, time);
+		            	EventItem tempList = (EventItem) new EventItem(name, time);
 						eventItems.add(tempList);
 		        	}
             	} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-            	
-            }
-            
-
-			// populate the day/time of the list with static data that I created
-			// in string value folder
-			/*for (int i = 0; i < mJsonArray1.length(); i++) {
-				try {
-					mJsonObject = mJsonArray1.getJSONObject(i);
-					name = mJsonObject.getString("SubEventName");
-					time = mJsonObject.getString("SubEventStartTime");
-					System.out.print(name + " " + time);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				// create a temp list to hold the info and then add to our
-				// ultimate list that has all the events of the expand list
-				EventItem tempList = new EventItem(name, time);
-				eventItems.add(tempList);
-			}
-			*/
-			for (int j = 0; j < getResources().getStringArray(R.array.days).length; j++) {
-				// create a group class (one per each day of the event) which
+            	// create a group class (one per each day of the event) which
 				// will contain all of the events(days of the festivals)
 				// we need to create a group class for each event date
 				Group groupTitle = new Group();
-				// populate the day title from our static info
-				// since I setup three days, we'll create three headers which
-				// will expand (saturday,sunday,monday)
-				groupTitle.setEventDay((getResources().getStringArray(
-						R.array.days)[j]));
+				groupTitle.setEventDay("Day " + (i));
 				// populate the events for each day from our eventItems
 				// arraylist above
 				// since the data is static, each day will contain the same
@@ -140,8 +107,8 @@ public class myAdapter extends FragmentPagerAdapter {
 				// add the days and events to our ultimate list which will pass
 				// it to our adapter
 				groupItem.add(groupTitle);
-			}
-
+            }
+            
 			// set the adapter for our list
 			// once the data is all set, we need to pass it to our adapter
 			ExlistView.setAdapter(new ScheduleListAdapter(groupItem));
