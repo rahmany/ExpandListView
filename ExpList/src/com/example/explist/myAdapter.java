@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +86,34 @@ public class myAdapter extends FragmentPagerAdapter {
 								+ eventInfo.getItemName() + "/"
 								+ eventInfo.getItemTime(), Toast.LENGTH_LONG)
 						.show();
+				
+				//create a Fragment  
+				FragmentDetail detailFragment = new FragmentDetail();  
+                   
+               
+                Bundle mBundle = new Bundle();  
+                mBundle.putString("name", eventInfo.getItemName()); 
+                mBundle.putString("time", eventInfo.getItemTime()); 
+                detailFragment.setArguments(mBundle);  
+                   
+                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();  
+                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();  
+                   
+                //check if the device is landscape or portrait 
+               //Configuration configuration = getActivity().getResources().getConfiguration();  
+               // int ori = configuration.orientation;  
+                 fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.replace(((ViewGroup)(getView().getParent())).getId(), detailFragment);  
+               
+                //if(ori == configuration.ORIENTATION_PORTRAIT){  
+                 //   fragmentTransaction.addToBackStack(null);  
+               // }  
+                   
+                fragmentTransaction.commit();  
+				
+				
+				
+				
 
 				return false;
 			}
@@ -111,7 +140,7 @@ public class myAdapter extends FragmentPagerAdapter {
 
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
-
+			setRetainInstance(true);
 			ExpandableListView ExlistView = (ExpandableListView) getActivity()
 					.findViewById(R.id.list);
 			// create an array list of eventItem so that we can put as many
@@ -164,4 +193,6 @@ public class myAdapter extends FragmentPagerAdapter {
 			ExlistView.setOnGroupClickListener(myListGroupClicked);
 		}
 	}
+	
+
 }
