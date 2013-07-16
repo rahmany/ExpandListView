@@ -1,19 +1,19 @@
 package com.example.explist;
 
 import java.util.ArrayList;
-
+import org.json.JSONException;
+import org.json.JSONObject;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
@@ -24,7 +24,8 @@ public class myAdapter extends FragmentPagerAdapter {
 	// set up an array
 	// for tab titles
 	private String title = "Schedule";
-
+	private static final boolean VERBOSE = true;
+	private static final String TAG = "ActivityStatus:";
 	public myAdapter(FragmentManager fm) {
 		super(fm);
 
@@ -34,7 +35,7 @@ public class myAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		// getItem is called to instantiate the fragment for the given section.
 
-		Fragment fragment = new scheduleFragment();
+		Fragment fragment = new scheduleFragment(null);
 
 		return fragment;
 	}
@@ -52,11 +53,13 @@ public class myAdapter extends FragmentPagerAdapter {
 
 	}
 
+	@SuppressLint("ValidFragment")
 	public static class scheduleFragment extends Fragment {
 		ArrayList<Group> groupItem = new ArrayList<Group>();
-
-		public scheduleFragment() {
-
+		JSONObject jsonObject;
+		@SuppressLint("ValidFragment")
+		public scheduleFragment(JSONObject jsonObject) {
+			this.jsonObject = jsonObject;
 		}
 
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,8 +92,7 @@ public class myAdapter extends FragmentPagerAdapter {
 				
 				//create a Fragment  
 				FragmentDetail detailFragment = new FragmentDetail();  
-                   
-               
+                
                 Bundle mBundle = new Bundle();  
                 mBundle.putString("name", eventInfo.getItemName()); 
                 mBundle.putString("time", eventInfo.getItemTime()); 
@@ -145,13 +147,48 @@ public class myAdapter extends FragmentPagerAdapter {
 					.findViewById(R.id.list);
 			// create an array list of eventItem so that we can put as many
 			// shows/events occurring
-			ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
+			//ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
 
 			String name = null;
 			String time = null;
 
 			// populate the day/time of the list with static data that I created
 			// in string value folder
+			for (int i = 1; i < jsonObject.length() + 1; i++) 
+            {
+            	// create an array list of eventItem so that we can put as many
+    			// shows/events occurring
+            	ArrayList<EventItem> eventItems = new ArrayList<EventItem>();
+            	try 
+            	{
+		        	for (int j = 0; j < jsonObject.getJSONArray("Day" + (i)).length(); j++) 
+		        	{
+						name = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventName");
+		            	//System.out.println("name test " + i + ":" + name);
+		            	time = jsonObject.getJSONArray("Day" + (i)).getJSONObject(j).getString("SubEventStartTime");
+		            	//System.out.println("Time test " + i + ":" + time);
+		            	EventItem tempList = (EventItem) new EventItem(name, time);
+						eventItems.add(tempList);
+		        	}
+            	} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	// create a group class (one per each day of the event) which
+				// will contain all of the events(days of the festivals)
+				// we need to create a group class for each event date
+				Group groupTitle = new Group();
+				groupTitle.setEventDay("Day " + (i));
+				// populate the events for each day from our eventItems
+				// arraylist above
+				// since the data is static, each day will contain the same
+				// stuff
+				groupTitle.setEventList(eventItems);
+				// add the days and events to our ultimate list which will pass
+				// it to our adapter
+				groupItem.add(groupTitle);
+            }
+			/*
 			for (int i = 0; i < getResources().getStringArray(R.array.names).length; i++) {
 
 				name = (getResources().getStringArray(R.array.names)[i]);
@@ -180,7 +217,7 @@ public class myAdapter extends FragmentPagerAdapter {
 				// it to our adapter
 				groupItem.add(groupTitle);
 			}
-
+			*/
 			// set the adapter for our list
 			// once the data is all set, we need to pass it to our adapter
 			ExlistView.setAdapter(new ScheduleListAdapter(getActivity(),
@@ -192,6 +229,26 @@ public class myAdapter extends FragmentPagerAdapter {
 			ExlistView.setOnChildClickListener(myListItemClicked);
 			ExlistView.setOnGroupClickListener(myListGroupClicked);
 		}
+		@Override
+	    public void onResume() {
+	        super.onResume();
+	        if (VERBOSE) Log.v(TAG, "+ ON RESUME +");
+	    }
+
+	    @Override
+	    public void onPause() {
+	        super.onPause();
+	        if (VERBOSE) Log.v(TAG, "- ON PAUSE -");
+	    }
+	    @Override
+	    public void onStart() {
+	        super.onStart();
+	        if (VERBOSE) Log.v(TAG, "++ ON START ++");
+	    }
+	    public void onReStart() {
+	        super.onStart();
+	        if (VERBOSE) Log.v(TAG, "++ ON RESTART ++");
+	    }
 	}
 	
 
